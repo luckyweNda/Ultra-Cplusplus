@@ -28,7 +28,7 @@ private:
     void do_read();
 
 private:
-    std::function<void(std::string)> receive_text_callback;
+    std::function<void(std::string)> receive_text_callback_;
 
 private:
     int port_;
@@ -47,7 +47,7 @@ inline void websocket_client::run()
 
 inline void websocket_client::on_received_text(std::function<void(std::string)> callback)
 {
-    receive_text_callback = callback;
+    receive_text_callback_ = callback;
 }
 
 inline void websocket_client::do_read()
@@ -58,8 +58,8 @@ inline void websocket_client::do_read()
                       << ec.what()
                       << std::endl;
 
-        if(receive_text_callback != nullptr)
-            receive_text_callback(boost::beast::buffers_to_string(buffer_.data()));
+        if(receive_text_callback_ != nullptr)
+            receive_text_callback_(boost::beast::buffers_to_string(buffer_.data()));
 
         do_read();
     });
@@ -81,7 +81,7 @@ inline websocket_client::websocket_client(std::string hostname, int port, std::s
     : hostname_(hostname),
       port_(port),
       handshake_path_(handshake_path),
-      receive_text_callback(nullptr),
+      receive_text_callback_(nullptr),
       endpoint_(boost::asio::ip::address::from_string(hostname), port),
       client_(io_context_)
 {

@@ -51,3 +51,22 @@ int main()
     client.run();
 }
 ```
+
+**qqbot**
+```cpp
+#include <iostream>
+#include <string>
+#include "cialloo/mirai/qqbot.hpp"
+
+
+int main()
+{
+    cialloo::mirai::qqbot bot("./config.json");
+    bot.send_to_group(123465, "Hello world.");
+    bot.received_text([](std::string str) {
+        std::cout << str << std::endl;
+    });
+
+    bot.run();
+}
+```

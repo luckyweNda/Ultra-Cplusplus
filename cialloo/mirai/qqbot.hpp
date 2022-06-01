@@ -5,7 +5,10 @@
 #include <nlohmann/json.hpp>
 #include <memory>
 #include <httplib.h>
+#include <functional>
 #include <fstream>
+#include "cialloo/network/websocket_client.hpp"
+#include <thread>
 
 namespace cialloo {
 namespace mirai {
@@ -31,7 +34,13 @@ public:
     qqbot(std::string config_path);
     ~qqbot();
 
+    qqbot(const qqbot&) = delete;
+    qqbot& operator=(const qqbot&) = delete;
+
+public:
     void send_to_group(unsigned long long group_number, std::string message);
+    void received_text(std::function<void(std::string)> callback);
+    void run();
 
 private:
     void verify();
@@ -47,13 +56,27 @@ private:
     std::string target_host_;
     nlohmann::json config_;
     std::shared_ptr<httplib::Client> http_client_;
+    std::function<void(std::string)> receive_callback_;
+    std::shared_ptr<cialloo::network::websocket_client> websocket_client_;
 };
+
+inline void qqbot::run()
+{
+    websocket_client_->run();
+}
+
+inline void qqbot::received_text(std::function<void(std::string)> callback)
+{
+    receive_callback_ = callback;
+    websocket_client_->on_received_text(receive_callback_);
+}
 
 inline qqbot::qqbot(std::string config_path)
     : http_port_(8080),
       qqnumber_(123456789ULL),
       session_key_(""),
-      target_host_("127.0.0.1")
+      target_host_("127.0.0.1"),
+      receive_callback_(nullptr)
 {
     std::ifstream config_file(config_path);
     config_ = nlohmann::json::parse(config_file);
@@ -122,6 +145,10 @@ inline void qqbot::parse_config()
     target_host_ = config_["hostname"].get<std::string>();
     verify_key_ = config_["verifykey"].get<std::string>();
     http_client_ = std::make_shared<httplib::Client>(target_host_, http_port_);
+
+    std::string handshake_path = "message?verifyKey=" + verify_key_ + "&qq=" + std::to_string(qqnumber_);
+    websocket_client_ = std::make_shared<cialloo::network::websocket_client>(target_host_, http_port_, handshake_path);
+    websocket_client_->on_received_text(receive_callback_);
 }
 
 
