@@ -65,5 +65,5 @@ inline tcp_client::~tcp_client()
     socket_->close();
 }
 
-}
-}
+} // namespace network
+} // namespace cialloo
