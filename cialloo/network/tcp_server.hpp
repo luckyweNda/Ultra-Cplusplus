@@ -16,6 +16,9 @@ public:
     explicit tcp_server(int listen_port);
     ~tcp_server();
 
+    tcp_server(const tcp_server&) = delete;
+    tcp_server& operator=(const tcp_server&) = delete;
+
 public:
     void run();
     int get_port() const;

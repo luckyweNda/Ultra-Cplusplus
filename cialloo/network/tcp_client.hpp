@@ -14,6 +14,9 @@ public:
     tcp_client(std::string hostname, int port);
     ~tcp_client();
 
+    tcp_client(const tcp_client&) = delete;
+    tcp_client& operator=(const tcp_client&) = delete;
+
 public:
     void send(std::string message);
     void send(const char* message, size_t size);
