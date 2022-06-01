@@ -61,6 +61,7 @@ inline void websocket_client::do_read()
         if(receive_text_callback_ != nullptr)
             receive_text_callback_(boost::beast::buffers_to_string(buffer_.data()));
 
+        buffer_.clear();
         do_read();
     });
 }
