@@ -1,3 +1,7 @@
+#ifndef CIALLOO_NETWORK_TCP_CLIENT_HPP
+#define CIALLOO_NETWORK_TCP_CLIENT_HPP
+
+
 #include <iostream>
 #include <string>
 #include <string_view>
@@ -70,3 +74,6 @@ inline tcp_client::~tcp_client()
 
 } // namespace network
 } // namespace cialloo
+
+
+#endif
