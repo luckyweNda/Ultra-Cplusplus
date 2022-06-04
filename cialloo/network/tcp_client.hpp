@@ -25,6 +25,13 @@ public:
     void send(std::string message);
     void send(const char* message, size_t size);
     std::string receive();
+    /**
+     * sync receive a message
+     * 
+     * @param buffer    a char pointer to store receive byte.
+     * @return          receive byte size with '\0' at last.
+     */
+    int receive(char* buffer);
 
 public:
     int get_port() const;
@@ -40,6 +47,15 @@ private:
     std::shared_ptr<boost::asio::ip::tcp::socket> socket_;
     std::shared_ptr<boost::asio::ip::tcp::endpoint> endpoint_;
 };
+
+inline int tcp_client::receive(char* buffer)
+{
+    boost::asio::mutable_buffer mbuffer;
+    socket_->receive(mbuffer);
+    buffer = new char[mbuffer.size() + 1];
+    std::copy(mbuffer.data(), mbuffer.data() + mbuffer.size(), buffer);
+    return mbuffer.size() + 1;
+}
 
 inline std::string tcp_client::buffer_to_string(const boost::asio::mutable_buffer& buffer)
 {
