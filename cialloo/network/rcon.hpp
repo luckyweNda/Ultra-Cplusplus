@@ -111,6 +111,8 @@ inline std::string rcon::send_command(std::string cmd)
     }
 
     id_++;
+    delete byte_array;
+    delete validator;
     return respond;
 }
 
@@ -121,7 +123,7 @@ inline unsigned char* rcon::packet_to_byte(packet pack)
     byte_array[4] = pack.id_;
     byte_array[8] = static_cast<int>(pack.type_);
     std::copy(pack.body_.c_str(), pack.body_.c_str() + pack.body_.length(), byte_array + 12);
-    byte_array[pack.size_ + SIZE_FIELD_SIZE] = pack.terminator_;
+    byte_array[pack.size_ + SIZE_FIELD_SIZE - 1] = pack.terminator_;
     return byte_array;
 }
 
